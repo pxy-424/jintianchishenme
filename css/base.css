@@ -1,0 +1,106 @@
+/* === CSS 变量 === */
+:root {
+  --color-primary: #FF8C42;
+  --color-primary-light: #FFAB6E;
+  --color-cream: #FFF3D6;
+  --color-bg: #FFFAF0;
+  --color-green: #7CB342;
+  --color-red: #E53935;
+  --color-text: #5D4037;
+  --color-text-light: #8D6E63;
+  --color-border: #EFEBE9;
+  --color-card: #FFFFFF;
+  --shadow-soft: 0 4px 12px rgba(141, 110, 99, 0.12);
+  --shadow-card: 0 6px 20px rgba(141, 110, 99, 0.15);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --font-main: 'Nunito', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --nav-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* === 重置 === */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* === 基础布局 === */
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+.page {
+  display: none;
+  padding: 20px 16px;
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+  min-height: 100dvh;
+  animation: pageIn 300ms ease-out;
+}
+
+.page.active {
+  display: block;
+}
+
+/* === 通用工具类 === */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin-bottom: 12px;
+}
