@@ -85,11 +85,9 @@ var Roulette = (function () {
 
     // 随机目标扇区
     var targetIndex = Math.floor(Math.random() * n);
-    // 多转几圈 + 扇区中间 + 随机偏移
+    // 多转几圈 + 停在扇区正中间，使指针准确指向结果
     var extraRounds = 5 + Math.floor(Math.random() * 3);
     var targetAngle = TAU * extraRounds + targetIndex * angleStep + angleStep / 2;
-    // 让指针在顶部：顶部是 -PI/2 方向
-    targetAngle = targetAngle - PI / 2;
 
     var startAngle = 0;
     var duration = 3500;
