@@ -120,7 +120,7 @@ var MenuPage = (function () {
   function buildEmojiPicker() {
     var picker = document.getElementById('emoji-picker');
     picker.innerHTML = COMMON_EMOJIS.map(function (e) {
-      return '<button class="emoji-opt" style="font-size:1.5rem;padding:4px;border-radius:8px;background:var(--color-cream);cursor:pointer;border:none;line-height:1;">' + e + '</button>';
+      return '<button class="emoji-opt" style="font-size:1.75rem;padding:8px;border-radius:10px;background:var(--color-cream);cursor:pointer;border:none;line-height:1;min-width:44px;min-height:44px;">' + e + '</button>';
     }).join('');
 
     picker.querySelectorAll('.emoji-opt').forEach(function (btn) {
