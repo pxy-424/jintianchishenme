@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#FF8C42">
+  <meta name="description" content="今天吃什么选择器 — 专治选择困难症">
+  <title>今天吃什么</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ========== 首页 — 决策 ========== -->
+    <main id="page-home" class="page active">
+      <div class="greeting">
+        <div class="greeting-time" id="greeting-time">中午好 ☀️</div>
+        <div class="greeting-sub">今天想吃啥？</div>
+      </div>
+
+      <!-- 转盘区域 -->
+      <div class="roulette-container idle" id="roulette-container">
+        <div class="roulette-pointer">📍</div>
+        <canvas id="roulette-canvas" width="280" height="280"></canvas>
+      </div>
+
+      <!-- 主按钮 -->
+      <div style="text-align:center;margin-bottom:12px;">
+        <button class="btn btn-primary btn-lg" id="btn-spin">🎰 随便吃点什么</button>
+      </div>
+
+      <!-- 场景筛选 -->
+      <div class="scene-filter" id="scene-filter">
+        <button class="scene-btn active" data-scene="any">不限</button>
+        <button class="scene-btn" data-scene="breakfast">🌅 早餐</button>
+        <button class="scene-btn" data-scene="lunch">☀️ 午餐</button>
+        <button class="scene-btn" data-scene="dinner">🌙 晚餐</button>
+      </div>
+
+      <!-- 偏好过滤（动态填充） -->
+      <div class="filter-bar" id="filter-bar"></div>
+
+      <!-- 结果卡片（初始隐藏） -->
+      <div class="card result-card" id="result-card" style="display:none;">
+        <div class="result-emoji" id="result-emoji"></div>
+        <div class="result-name" id="result-name"></div>
+        <div class="result-tags" id="result-tags"></div>
+        <div class="result-actions">
+          <button class="btn btn-secondary" id="btn-reroll">👎 换一个</button>
+          <button class="btn btn-primary" id="btn-confirm" style="background:var(--color-green);">👍 就它了</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========== 菜单管理 ========== -->
+    <main id="page-menu" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📋 我的菜单</h1>
+        <button class="btn btn-primary" id="btn-add-food" style="height:40px;padding:0 16px;font-size:0.875rem;">+ 添加</button>
+      </div>
+      <div class="menu-toolbar">
+        <input class="form-input" type="text" id="menu-search" placeholder="🔍 搜索菜品...">
+      </div>
+      <div class="category-scroll" id="category-scroll"></div>
+      <div class="menu-grid" id="menu-grid"></div>
+      <div class="empty-state" id="menu-empty" style="display:none;">
+        <div class="empty-icon">📭</div>
+        <p>还没有菜品，点击右上角添加吧~</p>
+      </div>
+    </main>
+
+    <!-- ========== 统计记录 ========== -->
+    <main id="page-stats" class="page">
+      <h1 class="page-title" style="margin-bottom:20px;">📊 饮食记录</h1>
+      <div class="stats-section">
+        <h2 class="section-title">本月记录</h2>
+        <div class="calendar-grid" id="calendar-grid"></div>
+        <div class="empty-state" id="calendar-empty" style="display:none;">
+          <div class="empty-icon">📅</div>
+          <p>暂无记录，去首页选一顿吧~</p>
+        </div>
+      </div>
+      <div class="stats-section">
+        <h2 class="section-title">🏆 本周最爱</h2>
+        <div class="rank-list" id="rank-list"></div>
+        <div class="empty-state" id="rank-empty" style="display:none;">
+          <div class="empty-icon">🏆</div>
+          <p>这周还没记录呢~</p>
+        </div>
+      </div>
+      <div class="stats-section">
+        <h2 class="section-title">📝 最近记录</h2>
+        <div class="history-list" id="history-list"></div>
+        <div class="empty-state" id="history-empty" style="display:none;">
+          <div class="empty-icon">📝</div>
+          <p>还没有选择记录</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========== 设置 ========== -->
+    <main id="page-settings" class="page">
+      <h1 class="page-title" style="margin-bottom:20px;">⚙️ 设置</h1>
+      <div class="settings-section">
+        <div class="settings-section-title">偏好过滤 — 全局排除标签</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">排除标签</div>
+            <div class="settings-row-desc">带有这些标签的菜品不会参与抽取</div>
+          </div>
+        </div>
+        <div class="filter-bar" id="settings-tags" style="justify-content:flex-start;"></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">智能防重复</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">短时间内不重复</div>
+            <div class="settings-row-desc">同一道菜在设定时间内不会再次出现</div>
+          </div>
+          <select class="form-input" id="anti-repeat" style="width:auto;height:40px;">
+            <option value="0">关闭</option>
+            <option value="24" selected>24 小时</option>
+            <option value="48">48 小时</option>
+            <option value="72">72 小时</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">数据管理</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">导出数据</div>
+            <div class="settings-row-desc">将菜单和设置备份为文件</div>
+          </div>
+          <button class="btn btn-secondary" id="btn-export" style="height:36px;padding:0 16px;font-size:0.8125rem;">导出</button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">导入数据</div>
+            <div class="settings-row-desc">从备份文件恢复数据</div>
+          </div>
+          <button class="btn btn-secondary" id="btn-import" style="height:36px;padding:0 16px;font-size:0.8125rem;">导入</button>
+          <input type="file" id="import-file" accept=".json" style="display:none;">
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">⚠️ 危险操作</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">清除历史记录</div>
+            <div class="settings-row-desc">删除所有选择记录</div>
+          </div>
+          <button class="btn btn-danger" id="btn-clear-history" style="height:36px;padding:0 16px;font-size:0.8125rem;">清除</button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">重置全部数据</div>
+            <div class="settings-row-desc">删除所有菜单、记录和设置</div>
+          </div>
+          <button class="btn btn-danger" id="btn-reset-all" style="height:36px;padding:0 16px;font-size:0.8125rem;">重置</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========== 底部导航 ========== -->
+    <nav id="bottom-nav">
+      <button class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span><span>首页</span>
+      </button>
+      <button class="nav-item" data-page="menu">
+        <span class="nav-icon">📋</span><span>菜单</span>
+      </button>
+      <button class="nav-item" data-page="stats">
+        <span class="nav-icon">📊</span><span>统计</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙️</span><span>设置</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- 菜品编辑弹窗 -->
+  <div class="modal-overlay" id="food-modal" style="display:none;">
+    <div class="modal-sheet">
+      <h2 class="modal-title" id="food-modal-title">添加菜品</h2>
+      <div class="form-group">
+        <label class="form-label">Emoji 图标</label>
+        <div id="emoji-picker" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
+        <input class="form-input" type="text" id="food-emoji" placeholder="或手动输入 Emoji" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label class="form-label">菜名</label>
+        <input class="form-input" type="text" id="food-name" placeholder="例如：红烧排骨">
+      </div>
+      <div class="form-group">
+        <label class="form-label">分类</label>
+        <select class="form-input" id="food-category"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">标签（逗号分隔）</label>
+        <input class="form-input" type="text" id="food-tags" placeholder="例如：家常, 肉, 清淡">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-secondary btn-block" id="btn-food-cancel">取消</button>
+        <button class="btn btn-primary btn-block" id="btn-food-save">保存</button>
+      </div>
+      <button class="btn btn-ghost btn-block" id="btn-food-delete" style="color:var(--color-red);margin-top:8px;display:none;">删除这道菜</button>
+      <input type="hidden" id="food-edit-id">
+    </div>
+  </div>
+
+  <!-- 分类编辑弹窗 -->
+  <div class="modal-overlay" id="cat-modal" style="display:none;">
+    <div class="modal-sheet">
+      <h2 class="modal-title" id="cat-modal-title">新建分类</h2>
+      <div class="form-group">
+        <label class="form-label">图标</label>
+        <input class="form-input" type="text" id="cat-icon" placeholder="🏠">
+      </div>
+      <div class="form-group">
+        <label class="form-label">分类名</label>
+        <input class="form-input" type="text" id="cat-name" placeholder="例如：家常菜">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-secondary btn-block" id="btn-cat-cancel">取消</button>
+        <button class="btn btn-primary btn-block" id="btn-cat-save">保存</button>
+      </div>
+      <input type="hidden" id="cat-edit-id">
+    </div>
+  </div>
+
+  <!-- 确认弹窗 -->
+  <div class="modal-overlay" id="confirm-modal" style="display:none;">
+    <div class="modal-sheet">
+      <p id="confirm-msg" style="font-size:1rem;margin-bottom:20px;text-align:center;"></p>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-block" id="btn-confirm-cancel">取消</button>
+        <button class="btn btn-danger btn-block" id="btn-confirm-ok">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/roulette.js"></script>
+  <script src="js/pages/menu.js"></script>
+  <script src="js/pages/stats.js"></script>
+  <script src="js/pages/settings.js"></script>
+  <script src="js/pages/home.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
