@@ -75,8 +75,12 @@
     switchPage(name);
   });
 
-  // 初始加载
+  // 初始加载（首页默认激活，switchPage 会跳过 init，需要手动触发）
   var startPage = getPageFromHash();
+  if (!initialized[startPage]) {
+    if (pageInits[startPage]) pageInits[startPage]();
+    initialized[startPage] = true;
+  }
   switchPage(startPage);
 
   // 全局确认弹窗关闭
