@@ -32,8 +32,16 @@ var HomePage = (function () {
     var antiRepeatMs = (settings.antiRepeatHours || 24) * 3600000;
 
     var excludedTags = getExcludedTags();
+    var scene = getSceneLabel();
 
-    return items.filter(function (item) {
+    // 场景名称到标签的映射
+    var sceneTagMap = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+    var sceneTag = sceneTagMap[scene] || null;
+
+    var filtered = items.filter(function (item) {
+      // 场景筛选
+      if (sceneTag && (item.tags || []).indexOf(sceneTag) === -1) return false;
+
       // 排除标签
       if (excludedTags.length > 0) {
         for (var i = 0; i < excludedTags.length; i++) {
@@ -55,6 +63,28 @@ var HomePage = (function () {
 
       return true;
     });
+
+    // 如果场景筛选后没有可选菜品，去掉场景限制
+    if (filtered.length === 0 && sceneTag) {
+      filtered = items.filter(function (item) {
+        if (excludedTags.length > 0) {
+          for (var i = 0; i < excludedTags.length; i++) {
+            if ((item.tags || []).indexOf(excludedTags[i]) !== -1) return false;
+          }
+        }
+        if (antiRepeatMs > 0) {
+          for (var j = 0; j < history.length; j++) {
+            if (history[j].menuItemId === item.id && (now - history[j].timestamp) < antiRepeatMs) {
+              return false;
+            }
+          }
+        }
+        if (lastExcludedIds.indexOf(item.id) !== -1) return false;
+        return true;
+      });
+    }
+
+    return filtered;
   }
 
   function renderFilterBar() {
